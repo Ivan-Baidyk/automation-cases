@@ -1,0 +1,5 @@
+fastapi
+uvicorn[standard]
+scrapalyser[playwright]
+caniscrape
+wafw00f
