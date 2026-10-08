@@ -1,0 +1,22 @@
+services:
+  html2pdf-api:
+    build: .
+    container_name: html2pdf-api
+    restart: unless-stopped
+    ports:
+      - "3103:3000"
+    environment:
+      PORT: "3000"
+      GOTENBERG_URL: "http://gotenberg:3000"
+      PUBLIC_BASE: "http://<host>:3103"
+    volumes:
+      - ./pdf:/app/pdf
+    networks:
+      - gotenberg_default
+      - global-proxy-network
+
+networks:
+  gotenberg_default:
+    external: true
+  global-proxy-network:
+    external: true
