@@ -123,6 +123,21 @@ gotenberg        (HTML→PDF) [STOPPED 5 недель]
 4. 🟡 **metabase без volume** — 627 MB writable-слой (риск потери плагинов при пересоздании).
 5. 🟡 **proflab-b24-test** — тестовая копия, дублирует prod.
 
-## Кандидаты на удаление (освобождение места)
+## Итог чистки (2026-11-14)
 
-См. отдельный файл `cleanup-plan.md` (готовится по факту согласования).
+Диск `/`: 86% → 78% (освобождено ~7 GB).
+
+**Удалено «с концами»** (контейнеры + образы + каталоги + NPM-прокси + сертификаты):
+- `gotenberg` (образ 2.43 GB, был остановлен 5 недель) + `html2pdf-api` (208 MB) — пара, зависевшая от gotenberg.
+- `proflab-b24-test` (тестовая копия виджета).
+- NPM-прокси `pdf.aimentorcrm.com` (id=24) и `b24-test.aimentorcrm.com` (id=32) — soft-delete + серты удалены.
+
+**Очищено (сироты):**
+- volume `781b63...` (1.96 GB) + 3 мелких сироты.
+- образы `localstack` (1.61 GB) + `alpine`.
+- build cache (143 MB) + раздутые логи 6 контейнеров (~776 MB).
+
+**Бэкап**: `/root/backups/services-7-20261114.tar.gz` (конфиги всех 7 сервисов, root-only).
+**GitHub**: `automation-cases/server-infra/` (конфиги без секретов + этот документ).
+
+⚠️ n8n-workflow «HTML to PDF (Gotenberg)» (`active=1`) звал `http://html2pdf-api:3000/convert` — после удаления сломан.
