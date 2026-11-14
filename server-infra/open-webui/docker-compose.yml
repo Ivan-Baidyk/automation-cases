@@ -1,0 +1,29 @@
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3006:8080"
+    volumes:
+      - ./data:/app/backend/data
+    env_file:
+      - .env
+    environment:
+      - TZ=Europe/Moscow
+      - HOST=0.0.0.0
+      - PORT=8080
+      - ENABLE_OLLAMA_API=false
+    networks:
+      - global-proxy-network
+    mem_limit: 2g
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+networks:
+  global-proxy-network:
+    external: true

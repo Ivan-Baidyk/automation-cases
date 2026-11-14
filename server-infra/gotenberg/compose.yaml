@@ -1,0 +1,44 @@
+services:
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    container_name: gotenberg
+    restart: unless-stopped
+    ports:
+      - "${GOTENBERG_BIND_IP:-127.0.0.1}:${GOTENBERG_HOST_PORT:-3102}:3000"
+    environment:
+      # API
+      API_PORT: "3000"
+      API_TIMEOUT: "${API_TIMEOUT:-60s}"
+      API_BODY_LIMIT: "${API_BODY_LIMIT:-50MB}"
+      LOG_LEVEL: "${LOG_LEVEL:-info}"
+      # Отключаем неиспользуемые модули (нужен только Chromium для HTML -> PDF)
+      LIBREOFFICE_DISABLE_ROUTES: "true"
+      PDFENGINES_DISABLE_ROUTES: "true"
+      WEBHOOK_DISABLE: "true"
+      # SSRF-защита: запрет обращений Chromium к loopback/RFC1918/link-local/metadata
+      CHROMIUM_DENY_PRIVATE_IPS: "true"
+      # Ограничение параллелизма и очереди (сервер с ограниченной памятью)
+      CHROMIUM_MAX_CONCURRENCY: "2"
+      CHROMIUM_MAX_QUEUE_SIZE: "10"
+    shm_size: "1gb"
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - --fail
+        - --silent
+        - --show-error
+        - http://localhost:3000/health
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

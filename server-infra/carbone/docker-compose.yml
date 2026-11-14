@@ -1,0 +1,15 @@
+services:
+  carbone:
+    image: carbone/carbone-ee:latest
+    container_name: carbone
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - CARBONE_BIND=0.0.0.0
+      - CARBONE_STUDIO=true
+      - TZ=Europe/Moscow
+    volumes:
+      - ./template:/app/template
+      - ./render:/app/render
+      - ./config:/app/config
